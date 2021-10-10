@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include <WiFi.h>
 #include "config.h"
+#include "h_sensors.h"
 
 void setup_wifi() {
   Serial.print("* Connecting to WiFi ");
@@ -20,9 +21,13 @@ void setup() {
   Serial.begin(115200);
   delay(100);
 
+  setup_sensors();
   setup_wifi();
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
+  delay(1000);
+
+  sensorvalues sv = get_sensor_values();
+  Serial.printf("Temperature: %.2f\nHumidity: %.2f\n\n", sv.temperature, sv.humidity);
 }
