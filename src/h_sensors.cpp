@@ -4,9 +4,11 @@
 #include "SHT2x.h"
 #include <Wire.h>
 #include <Sodaq_BMP085.h>
+#include <ccs811.h>
 
 SHT2x sht;
 Sodaq_BMP085 bmp;
+CCS811 ccs811(-1);
 
 void setup_sensors() {
     if (!sht.begin()) {
@@ -15,6 +17,16 @@ void setup_sensors() {
     }
 
     bmp.begin(BMP085_STANDARD);
+
+    if (!ccs811.begin()) {
+        Serial.println("CCS811 not found!");
+        while (1) {}
+    }
+
+    if (!ccs811.start(CCS811_MODE_1SEC)) {
+        Serial.println("CCS811 start failed!");
+        while (1) {}
+    }
 }
 
 sensorvalues get_sensor_values() {
@@ -30,12 +42,21 @@ sensorvalues get_sensor_values() {
     }
 
     sv.pressure = bmp.readPressure();
+
+    uint16_t eco2, etvoc, errstat, raw;
+    ccs811.read(&eco2, &etvoc, &errstat, &raw);
+    if (errstat == CCS811_ERRSTAT_OK) {
+        sv.eco2 = eco2;
+    } else {
+        Serial.println("Error reading eco2.");
+        sv.eco2 = -999;
+    }
     
     return sv;
 }
 
 void to_json(sensorvalues sv, char *buffer) {
       sprintf(buffer,
-    "{\"deviceId\": \"%s\",\"sensors\":[{\"type\": \"temperature\", \"unit\": \"Celsius\", \"value\": %.2f}, {\"type\": \"humidity\", \"unit\": \"%%\", \"value\": %.2f}, {\"type\": \"pressure\", \"unit\": \"Pa\", \"value\": %.2f}]}",
-    HOMEY_DEVICE_ID, sv.temperature, sv.humidity, sv.pressure);
+    "{\"deviceId\": \"%s\",\"sensors\":[{\"type\": \"temperature\", \"unit\": \"Celsius\", \"value\": %.2f}, {\"type\": \"humidity\", \"unit\": \"%%\", \"value\": %.2f}, {\"type\": \"pressure\", \"unit\": \"Pa\", \"value\": %.2f}, {\"type\": \"eco2\", \"unit\": \"ppm\", \"value\": %d}]}",
+    HOMEY_DEVICE_ID, sv.temperature, sv.humidity, sv.pressure, sv.eco2);
 }

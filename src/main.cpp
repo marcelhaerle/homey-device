@@ -43,7 +43,7 @@ void publish_data(char *json) {
   if (!client.connected()) {
     reconnect();
   } else {
-    client.publish(MQTT_TOPIC, json);
+    client.publish_P(MQTT_TOPIC, json, false);
     if (DEBUG) {
       Serial.println("> MQTT: Published data");
     }
@@ -65,14 +65,15 @@ void loop() {
   sensorvalues sv = get_sensor_values();
 
   if (DEBUG) {
-    Serial.println("\n#########################");
+    Serial.println("\n############################");
     Serial.printf("# Temperature: %.2f C\n", sv.temperature);
     Serial.printf("# Humidity:    %.2f %%\n", sv.humidity);
     Serial.printf("# Pressure:    %.2f Pa\n", sv.pressure);
-    Serial.println("#########################\n");
+    Serial.printf("# eCO2:        %d ppa\n", sv.eco2);
+    Serial.println("############################\n");
   }
   
-  char *json = (char *)malloc(sizeof(char) * 250);
+  char *json = (char *)malloc(sizeof(char) * 350);
   to_json(sv, json);
   publish_data(json);
   free(json);
