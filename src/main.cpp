@@ -64,12 +64,13 @@ void loop() {
   Serial.println("\n#########################");
   Serial.printf("# Temperature: %.2f C\n", sv.temperature);
   Serial.printf("# Humidity:    %.2f %%\n", sv.humidity);
+  Serial.printf("# Pressure:    %.2f Pa\n", sv.pressure);
   Serial.println("#########################\n");
 
   char *json = (char *)malloc(sizeof(char) * 200);
   sprintf(json,
-    "{\"deviceId\": \"%s\",\"sensors\":[{\"type\": \"temperature\", \"unit\": \"Celsius\", \"value\": %.2f}, {\"type\": \"humidity\", \"unit\": \"%%\", \"value\": %.2f}]}",
-    HOMEY_DEVICE_ID, sv.temperature, sv.humidity);
+    "{\"deviceId\": \"%s\",\"sensors\":[{\"type\": \"temperature\", \"unit\": \"Celsius\", \"value\": %.2f}, {\"type\": \"humidity\", \"unit\": \"%%\", \"value\": %.2f}, {\"type\": \"pressure\", \"unit\": \"Pa\", \"value\": %.2f}]}",
+    HOMEY_DEVICE_ID, sv.temperature, sv.humidity, sv.pressure);
   publish_data(json);
   free(json);
 }
