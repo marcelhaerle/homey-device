@@ -36,21 +36,21 @@ void setup_wifi() {
 
 void setup_mqtt() {
    client.setServer(MQTT_HOST, MQTT_PORT);
+   client.setKeepAlive(DELAY_SECONDS + 2);
    reconnect();
 }
 
 void publish_data(char *json, unsigned int len) {
   if (!client.connected()) {
     reconnect();
-  } else {
-    client.beginPublish(MQTT_TOPIC, len, false);
-    for (int i = 0; i < len; i++) {
-      client.write(json[i]);
-    }
-    client.endPublish();
-    if (DEBUG) {
-      Serial.println("> MQTT: Published data");
-    }
+  }
+  client.beginPublish(MQTT_TOPIC, len, false);
+  for (int i = 0; i < len; i++) {
+    client.write(json[i]);
+  }
+  client.endPublish();
+  if (DEBUG) {
+    Serial.println("> MQTT: Published data");
   }
 }
 
