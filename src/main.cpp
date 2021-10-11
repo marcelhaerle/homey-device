@@ -54,9 +54,24 @@ void publish_data(char *json, unsigned int len) {
   }
 }
 
+void print_config() {
+  Serial.println("## HOMEY CONFIGURATION");
+  Serial.printf("## WiFi SSID: %s\n", WIFI_SSID);
+  Serial.printf("## WiFi Password: %s\n", WIFI_PASSWORD);
+  Serial.printf("## MQTT Host: %s\n", MQTT_HOST);
+  Serial.printf("## MQTT Port: %d\n", MQTT_PORT);
+  Serial.printf("## Device ID: %s\n", HOMEY_DEVICE_ID);
+  Serial.printf("## Location: %s\n", HOMEY_LOCATION);
+  Serial.printf("## Debug: %d\n", DEBUG);
+  Serial.printf("## Delay seconds: %d", DELAY_SECONDS);
+  Serial.println("");
+}
+
 void setup() {
   Serial.begin(115200);
   delay(100);
+
+  print_config();
 
   setup_sensors();
   setup_wifi();
