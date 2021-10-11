@@ -39,11 +39,15 @@ void setup_mqtt() {
    reconnect();
 }
 
-void publish_data(char *json) {
+void publish_data(char *json, unsigned int len) {
   if (!client.connected()) {
     reconnect();
   } else {
-    client.publish_P(MQTT_TOPIC, json, false);
+    client.beginPublish(MQTT_TOPIC, len, false);
+    for (int i = 0; i < len; i++) {
+      client.write(json[i]);
+    }
+    client.endPublish();
     if (DEBUG) {
       Serial.println("> MQTT: Published data");
     }
@@ -73,8 +77,12 @@ void loop() {
     Serial.println("############################\n");
   }
   
-  char *json = (char *)malloc(sizeof(char) * 350);
+  int json_len = 300;
+  char *json = (char *)malloc(sizeof(char) * json_len);
   to_json(sv, json);
-  publish_data(json);
+  if (DEBUG) {
+    Serial.println(json);
+  }
+  publish_data(json, strlen(json));
   free(json);
 }

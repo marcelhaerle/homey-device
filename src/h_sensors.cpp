@@ -56,7 +56,18 @@ sensorvalues get_sensor_values() {
 }
 
 void to_json(sensorvalues sv, char *buffer) {
-      sprintf(buffer,
-    "{\"deviceId\": \"%s\",\"sensors\":[{\"type\": \"temperature\", \"unit\": \"Celsius\", \"value\": %.2f}, {\"type\": \"humidity\", \"unit\": \"%%\", \"value\": %.2f}, {\"type\": \"pressure\", \"unit\": \"Pa\", \"value\": %.2f}, {\"type\": \"eco2\", \"unit\": \"ppm\", \"value\": %d}]}",
-    HOMEY_DEVICE_ID, sv.temperature, sv.humidity, sv.pressure, sv.eco2);
+    const char *tpl = "{"
+        "\"deviceId\": \"%s\", "
+        "\"location\": \"%s\", "
+        "\"sensors\": ["
+            "{\"type\": \"temperature\", \"unit\": \"Celsius\", \"value\": %.2f}, "
+            "{\"type\": \"humidity\", \"unit\": \"%%\", \"value\": %.2f}, "
+            "{\"type\": \"pressure\", \"unit\": \"Pa\", \"value\": %.2f}, "
+            "{\"type\": \"eco2\", \"unit\": \"ppm\", \"value\": %d}"
+        "]"
+        "}";
+    sprintf(
+        buffer, tpl,
+        HOMEY_DEVICE_ID, HOMEY_LOCATION, sv.temperature, sv.humidity, sv.pressure, sv.eco2
+    );
 }
